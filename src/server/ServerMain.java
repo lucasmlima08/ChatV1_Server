@@ -89,10 +89,9 @@ public class ServerMain implements Server {
 			public void run() {
 				while (statusServer) {
 					try {
-						ArrayList<ServerClientCommunication> clientsClone = new ArrayList<>(clientsCommunication);
-						int index = 0;
+						ArrayList<ServerClientCommunication> clientsClone = new ArrayList<>();
 						// Percorre a lista de clientes conectados ao servidor.
-						for (ServerClientCommunication client: clientsClone){
+						for (ServerClientCommunication client: clientsCommunication){
 							// Verifica a inatividade do cliente.
 							if (client.isAvailable()){
 								// Adiciona a última requisição do cliente (caso exista) na lista de requisições do servidor.
@@ -101,11 +100,12 @@ public class ServerMain implements Server {
 									informationMessage("Requisição lida pelo servidor: " + request.getMessage() + " ::: " + request.getIdSend());
 									clientsRequests.add(request);
 								}
-							} else {
-								// Remove o cliente se estiver inativo. Retorna uma posição na leitura da lista.
-								removeClientDisconnected(index);
+								clientsClone.add(client);
 							}
 						}
+						// Atualiza a lista de clientes ativos.
+						clientsCommunication.clear();
+						clientsCommunication.addAll(clientsClone);
 					} catch (Exception e) {
 						informationMessage("Erro ao aguardar clientes: " + e.getMessage());
 					}
@@ -123,17 +123,21 @@ public class ServerMain implements Server {
 			public void run() {
 				while (statusServer) {
 					try {
+						// Copia as requisições para um array auxiliar e o esvazia.
+						ArrayList<ClientRequestModel> requestsCopy = new ArrayList<>(clientsRequests);
+						clientsRequests.clear();
 						// Percorre a lista de requisições do servidor.
-						for (ClientRequestModel request: clientsRequests){
+						for (ClientRequestModel request: requestsCopy){
 							// Envia as requisições para a lista de requisições dos clientes.
-							int index = 0;
-							for (ServerClientCommunication client: clientsCommunication){
+							int indexClient = 0;
+							ArrayList<ServerClientCommunication> clientsCopy = new ArrayList<>(clientsCommunication);
+							for (ServerClientCommunication client: clientsCopy){
 								// Verifica se o cliente possui o id entre os clientes requeridos da requisição.
 								if (request.getIdsClientsReceive().contains(client.getId())){
 									// Adiciona a requisição na lista de requisições recebidas do cliente.
-									clientsCommunication.get(index).addFirstRequestReceived(request);
+									clientsCopy.get(indexClient).addFirstRequestReceived(request);
 								}
-								index++;
+								indexClient++;
 							}
 						}
 					} catch (Exception e) {
@@ -143,13 +147,6 @@ public class ServerMain implements Server {
 			}
 		});
 		return communicationClients;
-	}
-
-	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *  Método de Remoção de Cliente.
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	public void removeClientDisconnected(int position) {
-		clientsCommunication.remove(position);
 	}
 	
 	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

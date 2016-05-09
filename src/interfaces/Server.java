@@ -45,13 +45,7 @@ public interface Server {
 	 *  Inclui as requisições na lista de recebimento dos clientes requeridos.
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	public Thread writeRequestsClients();
-	
-	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *  Método de Remoção de Cliente:
-	 *  Remove um cliente desconectado e sem requisições da lista de clientes.
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	public void removeClientDisconnected(int position);
-	
+		
 	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *  Método de informação:
 	 *  Exibe uma mensagem de informação.

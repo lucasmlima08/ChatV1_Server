@@ -95,7 +95,7 @@ public class ServerClientCommunication implements ClientCommunication {
 	 *  Método de Leitura da Requisição de Envio.
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	public ClientRequestModel getFirstRequestSend() {
-		if (!requestsSend.isEmpty()) {
+		if (!requestsSend.isEmpty()){
 			ClientRequestModel request = requestsSend.get(0);
 			requestsSend.remove(0);
 			return request;
@@ -140,7 +140,7 @@ public class ServerClientCommunication implements ClientCommunication {
 						// Faz a leitura das requisições enviadas pelo cliente e joga na lista.
 						String read = bufferedReader.readLine();
 						if (!read.equals("")){
-							ClientRequestModel request = new ClientRequestModel(idClient, read, null);
+							ClientRequestModel request = processRequisition(read);
 							requestsSend.add(request);
 						}
 					}
@@ -150,6 +150,19 @@ public class ServerClientCommunication implements ClientCommunication {
 			}
 		});
 		return send;
+	}
+	
+	// <split> separa o id da mensagem
+	// a virgula separa os ids.
+	private ClientRequestModel processRequisition(String read){
+		String[] splitAux = read.split("<split>");
+		String[] idsStringArray = splitAux[0].split(",");
+		ArrayList<Integer> ids = new ArrayList<>();
+		for (String id: idsStringArray){
+			ids.add(Integer.parseInt(id));
+		}
+		ClientRequestModel request = new ClientRequestModel(idClient, splitAux[1], ids);
+		return request;
 	}
 
 	/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
